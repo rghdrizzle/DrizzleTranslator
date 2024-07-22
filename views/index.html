@@ -121,7 +121,7 @@
             recognition.start();
         });
         async function fetchLanguages() {
-            const response = await fetch('http://localhost:3000/getLanguages');
+            const response = await fetch('https://eldest-nata-rghdrizzle-d9d6f3ac.koyeb.app/getLanguages');
             const data = await response.json();
             console.log(data);
             const dropdown = document.getElementById('target');
@@ -145,7 +145,7 @@
             console.log(sourceText);
             const targetLanguage = document.getElementById('target').value;
             if (sourceText && targetLanguage) {
-                const response = await fetch('http://localhost:3000/translate?source='+encodeURIComponent(sourceText)+'&target='+encodeURIComponent(targetLanguage));
+                const response = await fetch('https://eldest-nata-rghdrizzle-d9d6f3ac.koyeb.app/translate?source='+encodeURIComponent(sourceText)+'&target='+encodeURIComponent(targetLanguage));
                 const result = await response.json();
                 console.log(result);
                 const translatedText = result;

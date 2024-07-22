@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"rghdrizzle/drizzletranslator/helper"
@@ -21,6 +22,7 @@ import (
 func DetectLanguage(payload string)response.DetectResponse{
 	API_KEY := os.Getenv("API_KEY")
 	client := resty.New()
+	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	// payload := `{"q":"سَلَام"}`
 	var detectResponse response.DetectResponse
 	resp, err := client.R().
@@ -50,6 +52,7 @@ func Translate(c *fiber.Ctx)error{
 	var detectResponse response.DetectResponse
 
 	client := resty.New()
+	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	inputText := c.FormValue("source")
 	targetLangSelected := c.FormValue("target")
 	fmt.Println("TargetLang:"+targetLangSelected)
@@ -99,6 +102,7 @@ func Translate(c *fiber.Ctx)error{
 func GetLanguages(c *fiber.Ctx)error{
 	API_KEY := os.Getenv("API_KEY")
 	client:= resty.New()
+	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	resp,err := client.R().
 	SetHeader("x-rapidapi-key", API_KEY).
 	SetHeader("x-rapidapi-host", "google-translator9.p.rapidapi.com").
