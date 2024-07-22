@@ -5,11 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DrizzleTranslatort</title>
 </head>
-<body>
-    <form method="get" action="http://localhost:3000/translate">
-        <input type="text" name="source">
-        <input type="submit" value="Translate">
+<script>
+    async function fetchLanguages() {
+            const response = await fetch('http://localhost:3000/getLanguages');
+            const data = await response.json();
+            console.log(data)
+            const dropdown = document.getElementById('target');
+            data.forEach(language => {
+                const option = document.createElement('option');
+                option.value = language.language;
+                option.textContent = language.language; // Use the language code as text
+                dropdown.appendChild(option);
+            });
         
+        
+    }
+
+        async function translateText(event) {
+        event.preventDefault(); // Prevent the form from submitting normally
+
+        const sourceText = document.querySelector('input[name="source"]').value;
+        const targetLanguage = document.getElementById('target').value;
+
+        if (sourceText && targetLanguage) {
+            const response = await fetch('http://localhost:3000/translate?source=' + encodeURIComponent(sourceText) + '&target=' + encodeURIComponent(targetLanguage));
+            const result = await response.json();
+            console.log(result);
+            const translatedText = result;
+
+            // Display the translated text
+            document.getElementById('translationResult').textContent = translatedText;
+        } else {
+            document.getElementById('translationResult').textContent = 'Please enter text and select a language.';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchLanguages();
+        document.querySelector('form').addEventListener('submit', translateText);
+    });
+
+</script>
+<body>
+    <form>
+        <input type="text" name="source">
+        <select id="target" name="target">
+            <option value="">Select a language</option>
+        </select>
+        <input type="submit" value="Translate">
     </form>
+    <p id="translationResult"></p> 
 </body>
 </html>

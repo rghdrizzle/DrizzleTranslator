@@ -7,9 +7,14 @@ type DetectResponse struct {
         } `json:"detections"`
     } `json:"data"`
 }
+type Translation struct {
+    TranslatedText string `json:"translatedText"`
+}
 
-type TranslateResponse struct{
-	TargetText string `json:"targetText"`
+type TranslateResponse struct {
+    Data struct {
+        Translations []Translation `json:"translations"`
+    } `json:"data"`
 }
 
 type TranslateRequest struct {

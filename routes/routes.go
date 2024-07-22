@@ -7,4 +7,5 @@ import(
 
 func UserRoutes(app *fiber.App){
 	app.Get("/translate",controller.Translate)
+	app.Get("/getLanguages",controller.GetLanguages)
 }

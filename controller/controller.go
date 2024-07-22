@@ -44,7 +44,8 @@ func Translate(c *fiber.Ctx)error{
 
 	client := resty.New()
 	inputText := c.FormValue("source")
-	targetLangSelected := "en"//c.FormValue("target")
+	targetLangSelected := c.FormValue("target")
+	fmt.Println("TargetLang:"+targetLangSelected)
 	payloadToDetect := fmt.Sprintf("{\"q\":\"%s\"}", inputText)
 	detectResponse = DetectLanguage(payloadToDetect)
 	reqBody.SourceLang = detectResponse.Data.Detections[0][0].Language
@@ -74,9 +75,37 @@ func Translate(c *fiber.Ctx)error{
 	if err != nil {
         log.Fatal("Error:",err)
     }
+	var translateResponse response.TranslateResponse
+    err = json.Unmarshal(resp.Body(), &translateResponse)
+    if err != nil {
+        log.Fatal("Error:", err)
+        return err
+	}
+	translatedText := translateResponse.Data.Translations[0].TranslatedText
 
 
 
-	return c.JSON(resp.String())
+	return c.JSON(translatedText)
 	
+}
+
+func GetLanguages(c *fiber.Ctx)error{
+	client:= resty.New()
+	resp,err := client.R().
+	SetHeader("x-rapidapi-key", "491d9b6e75msh35b56ae3d1c2b01p199039jsn53d6861791f8").
+	SetHeader("x-rapidapi-host", "google-translator9.p.rapidapi.com").
+	Get("https://google-translator9.p.rapidapi.com/v2/languages")
+
+	if err != nil {
+        log.Fatal("Error:",err)
+    }
+
+	var result map[string]map[string][]map[string]string
+	if err := json.Unmarshal(resp.Body(), &result); err != nil {
+		log.Fatal("Error parsing response:", err)
+	}
+
+	languages := result["data"]["languages"]
+	return c.JSON(languages)
+
 }
