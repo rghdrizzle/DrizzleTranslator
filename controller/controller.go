@@ -11,16 +11,20 @@ import (
 	// "bytes"
 	// "io/ioutil"
 	// "net/http"
+	"os"
 	"github.com/go-resty/resty/v2"
 	"github.com/gofiber/fiber/v2"
 )
 
+
+
 func DetectLanguage(payload string)response.DetectResponse{
+	API_KEY := os.Getenv("API_KEY")
 	client := resty.New()
 	// payload := `{"q":"سَلَام"}`
 	var detectResponse response.DetectResponse
 	resp, err := client.R().
-	SetHeader("x-rapidapi-key", "491d9b6e75msh35b56ae3d1c2b01p199039jsn53d6861791f8").
+	SetHeader("x-rapidapi-key", API_KEY).
 	SetHeader("x-rapidapi-host", "google-translator9.p.rapidapi.com").
 	SetHeader("Content-Type", "application/json").
 	SetBody(payload).
@@ -41,6 +45,7 @@ func DetectLanguage(payload string)response.DetectResponse{
 }
 
 func Translate(c *fiber.Ctx)error{
+	API_KEY := os.Getenv("API_KEY")
 	var reqBody helper.ReqBody
 	var detectResponse response.DetectResponse
 
@@ -68,7 +73,7 @@ func Translate(c *fiber.Ctx)error{
 	}
 
 	resp,err := client.R().
-	SetHeader("x-rapidapi-key", "491d9b6e75msh35b56ae3d1c2b01p199039jsn53d6861791f8").
+	SetHeader("x-rapidapi-key", API_KEY).
 	SetHeader("x-rapidapi-host", "google-translator9.p.rapidapi.com").
 	SetHeader("Content-Type", "application/json").
 	SetBody(payload).
@@ -92,9 +97,10 @@ func Translate(c *fiber.Ctx)error{
 }
 
 func GetLanguages(c *fiber.Ctx)error{
+	API_KEY := os.Getenv("API_KEY")
 	client:= resty.New()
 	resp,err := client.R().
-	SetHeader("x-rapidapi-key", "491d9b6e75msh35b56ae3d1c2b01p199039jsn53d6861791f8").
+	SetHeader("x-rapidapi-key", API_KEY).
 	SetHeader("x-rapidapi-host", "google-translator9.p.rapidapi.com").
 	Get("https://google-translator9.p.rapidapi.com/v2/languages")
 
