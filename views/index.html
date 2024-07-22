@@ -86,7 +86,7 @@
         <form id="text">
             <button id="startButton">Start Voice Input</button>
             <div id="output"></div>
-            <input type="text" name="source" placeholder="Enter text to translate/Leave it blank if voice recording is used">
+            <input type="text" id="sourceText" name="source">
             <select id="target" name="target">
                 <option value="">Select a language</option>
             </select>
@@ -136,11 +136,14 @@
         async function translateText(event) {
             event.preventDefault(); 
 
-            const sourceTextInput = document.querySelector('input[name="source"]').value;
-            let sourceText = sourceTextInput.value;
+            const sourceTextInput = document.getElementById('sourceText').value;
+            console.log(sourceTextInput);
+            let sourceText = sourceTextInput;
             if (!sourceText) {
                 sourceText = text;
                 console.log("it works");
+            }else{
+                sourceText = sourceTextInput;
             }
             console.log(sourceText);
             const targetLanguage = document.getElementById('target').value;
