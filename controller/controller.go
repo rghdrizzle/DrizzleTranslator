@@ -8,7 +8,9 @@ import (
 	"rghdrizzle/drizzletranslator/response"
 
 	//"strings"
-
+	// "bytes"
+	// "io/ioutil"
+	// "net/http"
 	"github.com/go-resty/resty/v2"
 	"github.com/gofiber/fiber/v2"
 )
@@ -109,3 +111,4 @@ func GetLanguages(c *fiber.Ctx)error{
 	return c.JSON(languages)
 
 }
+

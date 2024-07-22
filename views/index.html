@@ -3,57 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DrizzleTranslatort</title>
+    <title>DrizzleTranslator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f3f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .header {
+            background-color: #4285f4;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            text-align: center;
+        }
+        .main {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 80px; /* Adjust for header height */
+            max-width: 500px;
+            width: 100%;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        input[type="text"], select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 100%;
+        }
+        input[type="submit"] {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #357ae8;
+        }
+        #translationResult {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+        .header img {
+            height: 40px;
+        }
+    </style>
 </head>
-<script>
-    async function fetchLanguages() {
+<body>
+    <div class="header">
+        <a href="https://www.fontspace.com/category/scoreboard">
+            <img src="https://see.fontimg.com/api/renderfont4/4n30l/eyJyIjoiZnMiLCJoIjo4MSwidyI6MTI1MCwiZnMiOjY1LCJmZ2MiOiIjMDAwMDAwIiwiYmdjIjoiI0ZGRkZGRiIsInQiOjF9/RHJpenpsZSBUcmFuc2xhdG9y/mintsoda-lime-green-13x16-regular.png" alt="Scoreboard fonts">
+        </a>
+    </div>
+    <div class="main">
+        <form id="text">
+            <button id="startButton">Start Voice Input</button>
+            <div id="output"></div>
+            <input type="text" name="source" placeholder="Enter text to translate/Leave it blank if voice recording is used">
+            <select id="target" name="target">
+                <option value="">Select a language</option>
+            </select>
+            <input type="submit" value="Translate">
+        </form>
+        <p id="translationResult"></p> 
+    </div>
+
+    <script>
+        const startButton = document.getElementById('startButton');
+        const outputDiv = document.getElementById('output');
+        let text;
+
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
+        //recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+            startButton.textContent = 'Listening...';
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            outputDiv.textContent = transcript;
+            text = transcript;
+        };
+
+        recognition.onend = () => {
+            startButton.textContent = 'Start Voice Input';
+        };
+
+        startButton.addEventListener('click', () => {
+            recognition.start();
+        });
+        async function fetchLanguages() {
             const response = await fetch('http://localhost:3000/getLanguages');
             const data = await response.json();
-            console.log(data)
+            console.log(data);
             const dropdown = document.getElementById('target');
             data.forEach(language => {
                 const option = document.createElement('option');
                 option.value = language.language;
-                option.textContent = language.language; // Use the language code as text
+                option.textContent = language.language; 
                 dropdown.appendChild(option);
             });
-        
-        
-    }
+        }
 
         async function translateText(event) {
-        event.preventDefault(); // Prevent the form from submitting normally
+            event.preventDefault(); 
 
-        const sourceText = document.querySelector('input[name="source"]').value;
-        const targetLanguage = document.getElementById('target').value;
-
-        if (sourceText && targetLanguage) {
-            const response = await fetch('http://localhost:3000/translate?source=' + encodeURIComponent(sourceText) + '&target=' + encodeURIComponent(targetLanguage));
-            const result = await response.json();
-            console.log(result);
-            const translatedText = result;
-
-            // Display the translated text
-            document.getElementById('translationResult').textContent = translatedText;
-        } else {
-            document.getElementById('translationResult').textContent = 'Please enter text and select a language.';
+            const sourceTextInput = document.querySelector('input[name="source"]').value;
+            let sourceText = sourceTextInput.value;
+            if (!sourceText) {
+                sourceText = text;
+                console.log("it works");
+            }
+            console.log(sourceText);
+            const targetLanguage = document.getElementById('target').value;
+            if (sourceText && targetLanguage) {
+                const response = await fetch('http://localhost:3000/translate?source='+encodeURIComponent(sourceText)+'&target='+encodeURIComponent(targetLanguage));
+                const result = await response.json();
+                console.log(result);
+                const translatedText = result;
+                document.getElementById('translationResult').textContent = translatedText;
+            } else {
+                document.getElementById('translationResult').textContent = 'Please enter text and select a language.';
+            }
         }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        fetchLanguages();
-        document.querySelector('form').addEventListener('submit', translateText);
-    });
-
-</script>
-<body>
-    <form>
-        <input type="text" name="source">
-        <select id="target" name="target">
-            <option value="">Select a language</option>
-        </select>
-        <input type="submit" value="Translate">
-    </form>
-    <p id="translationResult"></p> 
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchLanguages();
+            document.querySelector('form').addEventListener('submit', translateText);
+        });
+    </script>
 </body>
 </html>
